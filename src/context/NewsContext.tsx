@@ -128,10 +128,8 @@ export const NewsProvider: React.FC<{ children: React.ReactNode }> = ({
           return;
         }
 
-        const { articles, failedSources } = await fetchBatchSources(
-          targetSources,
-          force
-        );
+        const { articles, failedSources, apiUnavailable } =
+          await fetchBatchSources(targetSources, force);
 
         cacheRef.current[categoryId] = articles;
         setArticlesByCategory((prev) => ({
@@ -139,7 +137,13 @@ export const NewsProvider: React.FC<{ children: React.ReactNode }> = ({
           [categoryId]: articles,
         }));
 
-        if (articles.length === 0 && failedSources.length > 0) {
+        if (apiUnavailable) {
+          showMonochromeAlert(
+            'Feed Proxy Not Active',
+            'The /api/feed endpoint returned HTML instead of JSON. When deploying to Cloudflare Pages, deploy via Git or Wrangler CLI so functions/api/feed.ts is included alongside dist/.',
+            'error'
+          );
+        } else if (articles.length === 0 && failedSources.length > 0) {
           showMonochromeAlert(
             'Unable to Load Feeds',
             'None of the publishers in this category responded in time. Please check your connection or try refreshing.',

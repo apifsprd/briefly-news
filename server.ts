@@ -45,22 +45,29 @@ const CACHE_TTL_MS = 60 * 1000;
 const feedCache = new Map<string, CacheEntry>();
 
 function loadAllowedUrls(): Set<string> {
-  const rssPath = path.resolve(__dirname, 'public/rss.json');
-  try {
-    const raw = fs.readFileSync(rssPath, 'utf-8');
-    const directory = JSON.parse(raw) as RSSDirectory;
-    const urls = new Set<string>();
-    for (const category of directory.categories || []) {
-      for (const feed of category.feeds || []) {
-        if (feed.url) {
-          urls.add(feed.url);
+  const candidates = [
+    path.resolve(__dirname, 'public/rss.json'),
+    path.resolve(__dirname, 'dist/rss.json'),
+  ];
+  for (const rssPath of candidates) {
+    try {
+      if (!fs.existsSync(rssPath)) continue;
+      const raw = fs.readFileSync(rssPath, 'utf-8');
+      const directory = JSON.parse(raw) as RSSDirectory;
+      const urls = new Set<string>();
+      for (const category of directory.categories || []) {
+        for (const feed of category.feeds || []) {
+          if (feed.url) {
+            urls.add(feed.url);
+          }
         }
       }
+      if (urls.size > 0) return urls;
+    } catch {
+      // Try next candidate
     }
-    return urls;
-  } catch {
-    return new Set<string>();
   }
+  return new Set<string>();
 }
 
 const allowedFeedUrls = loadAllowedUrls();
@@ -370,9 +377,10 @@ async function createServer() {
     try {
       const response = await fetch(feedUrl, {
         headers: {
-          'User-Agent': 'BrieflyNewsBot/1.0 (+https://briefly.app)',
+          'User-Agent': 'Mozilla/5.0 (compatible; BrieflyReader/1.0)',
           Accept: 'application/rss+xml, application/atom+xml, application/xml, text/xml;q=0.9, */*;q=0.8',
         },
+        redirect: 'follow',
         signal: AbortSignal.timeout(8000),
       });
 

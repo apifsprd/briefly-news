@@ -57,6 +57,12 @@ export async function fetchSourceArticles(
   }
 
   const response = await fetch(`/api/feed?${params.toString()}`);
+  const contentType = response.headers.get('content-type') || '';
+
+  if (!contentType.includes('application/json')) {
+    throw new Error('API_UNAVAILABLE');
+  }
+
   if (!response.ok) {
     throw new Error(`Unable to fetch ${source.name}`);
   }
@@ -90,6 +96,7 @@ export async function fetchBatchSources(
 ): Promise<{
   articles: ArticleItem[];
   failedSources: string[];
+  apiUnavailable: boolean;
 }> {
   const results = await Promise.allSettled(
     sources.map((source) => fetchSourceArticles(source, forceRefresh))
@@ -97,14 +104,24 @@ export async function fetchBatchSources(
 
   const articles: ArticleItem[] = [];
   const failedSources: string[] = [];
+  let unavailableCount = 0;
 
   results.forEach((result, index) => {
     if (result.status === 'fulfilled') {
       articles.push(...result.value);
     } else {
       failedSources.push(sources[index].name);
+      if (
+        result.reason instanceof Error &&
+        result.reason.message === 'API_UNAVAILABLE'
+      ) {
+        unavailableCount += 1;
+      }
     }
   });
+
+  const apiUnavailable =
+    sources.length > 0 && unavailableCount === sources.length;
 
   // Deduplicate by article link and sort newest first
   const seenLinks = new Set<string>();
@@ -117,5 +134,5 @@ export async function fetchBatchSources(
       return true;
     });
 
-  return { articles: uniqueArticles, failedSources };
+  return { articles: uniqueArticles, failedSources, apiUnavailable };
 }

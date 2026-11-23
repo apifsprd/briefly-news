@@ -1,7 +1,7 @@
 {
-  "name": "Briefly — Minimalist News Aggregator",
+  "name": "Briefly — Official RSS News",
   "short_name": "Briefly",
-  "description": "Minimalist mobile-first monochrome RSS news aggregator.",
+  "description": "Briefly delivers news through ethical extraction, sourcing exclusively from official RSS feeds to ensure credibility.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
