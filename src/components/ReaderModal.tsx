@@ -7,6 +7,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { ArticleItem } from '../types/rss';
 import { formatFullDate } from '../utils/date';
+import { ArticleImage } from './ArticleImage';
 
 interface ReaderModalProps {
   article: ArticleItem | null;
@@ -92,9 +93,15 @@ export const ReaderModal: React.FC<ReaderModalProps> = ({
               {article.title}
             </h2>
 
-            <p className="text-xs font-mono tabular-nums text-zinc-500 dark:text-zinc-400 mb-6">
+            <p className="text-xs font-mono tabular-nums text-zinc-500 dark:text-zinc-400 mb-5">
               Published {formatFullDate(article.pubDate)}
             </p>
+
+            <ArticleImage
+              src={article.imageUrl}
+              alt={article.title}
+              className="aspect-[16/9] max-h-64 w-full rounded-xl mb-5"
+            />
 
             <div className="text-sm sm:text-base leading-relaxed text-zinc-700 dark:text-zinc-300 mb-8 max-w-prose">
               {article.description}

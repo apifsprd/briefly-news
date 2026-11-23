@@ -52,6 +52,80 @@ function sanitizeHttpUrl(raw: unknown): string {
   return '#';
 }
 
+function validateImageCandidate(raw: unknown): string | undefined {
+  if (!raw || typeof raw !== 'string') return undefined;
+  const trimmed = raw.trim();
+  const lower = trimmed.toLowerCase();
+  if (
+    !trimmed ||
+    lower.includes('feedburner.com') ||
+    lower.includes('doubleclick.net') ||
+    lower.includes('1x1') ||
+    lower.includes('/pixel') ||
+    lower.endsWith('.svg')
+  ) {
+    return undefined;
+  }
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+      return parsed.toString();
+    }
+  } catch {
+    // Ignore invalid URL
+  }
+  return undefined;
+}
+
+function pickMediaImage(node: unknown): string | undefined {
+  if (!node) return undefined;
+  if (Array.isArray(node)) {
+    for (const entry of node) {
+      const found = pickMediaImage(entry);
+      if (found) return found;
+    }
+    return undefined;
+  }
+  if (typeof node === 'object') {
+    const obj = node as Record<string, unknown>;
+    const type = String(obj['@_type'] ?? '').toLowerCase();
+    const medium = String(obj['@_medium'] ?? '').toLowerCase();
+    const url = String(obj['@_url'] ?? obj['@_href'] ?? obj['url'] ?? obj['#text'] ?? '');
+    if (
+      !type ||
+      type.startsWith('image/') ||
+      medium === 'image' ||
+      /\.(jpe?g|png|webp|avif|gif)(\?|$)/i.test(url)
+    ) {
+      return validateImageCandidate(url);
+    }
+  }
+  if (typeof node === 'string') return validateImageCandidate(node);
+  return undefined;
+}
+
+function extractImageFromHtml(rawHtml: unknown): string | undefined {
+  if (typeof rawHtml !== 'string') return undefined;
+  const match = rawHtml.match(/<img[^>]+?(?:src|data-src)=["']([^"']+)["'][^>]*>/i);
+  return match ? validateImageCandidate(match[1]) : undefined;
+}
+
+function extractImageUrl(item: Record<string, any>): string | undefined {
+  const mediaGroup = item?.['media:group'];
+  return [
+    pickMediaImage(item?.['media:content']),
+    pickMediaImage(mediaGroup?.['media:content']),
+    pickMediaImage(item?.['media:thumbnail']),
+    pickMediaImage(mediaGroup?.['media:thumbnail']),
+    pickMediaImage(item?.enclosure),
+    pickMediaImage(item?.['itunes:image']),
+    pickMediaImage(item?.['image:image']?.['image:loc']),
+    extractImageFromHtml(item?.['content:encoded']),
+    extractImageFromHtml(item?.content),
+    extractImageFromHtml(item?.description),
+  ].find((url): url is string => Boolean(url));
+}
+
 export const onRequestGet: PagesFunction<Env> = async (context) => {
   const urlParams = new URL(context.request.url).searchParams;
   const feedUrl = urlParams.get('url');
@@ -113,12 +187,14 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
         );
         const parsedMs = rawDate ? Date.parse(rawDate) : NaN;
         const timestamp = Number.isNaN(parsedMs) ? Date.now() : parsedMs;
+        const imageUrl = extractImageUrl(item);
 
         return {
           id: `${sourceId}-${index}-${timestamp}`,
           title,
           link,
           description,
+          ...(imageUrl ? { imageUrl } : {}),
           pubDate: new Date(timestamp).toISOString(),
           timestamp,
           sourceId,

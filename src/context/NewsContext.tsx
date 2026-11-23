@@ -119,7 +119,7 @@ export const NewsProvider: React.FC<{ children: React.ReactNode }> = ({
       try {
         const targetSources =
           categoryId === 'all'
-            ? getCuratedAllSources(loadedCategories, loadedSources, 2)
+            ? getCuratedAllSources(loadedCategories, loadedSources, 3)
             : loadedSources.filter((src) => src.categoryId === categoryId);
 
         if (targetSources.length === 0) {
@@ -199,6 +199,7 @@ export const NewsProvider: React.FC<{ children: React.ReactNode }> = ({
     (categoryId: string) => {
       setActiveCategoryState(categoryId);
       setActiveSource('all');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       if (categories.length > 0) {
         void loadCategoryFeeds(categoryId, categories, sources);
       }
@@ -224,7 +225,7 @@ export const NewsProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const availableSourcesInView = useMemo(() => {
     if (activeCategory === 'all') {
-      return getCuratedAllSources(categories, sources, 2);
+      return getCuratedAllSources(categories, sources, 3);
     }
     return sources.filter((src) => src.categoryId === activeCategory);
   }, [activeCategory, categories, sources]);

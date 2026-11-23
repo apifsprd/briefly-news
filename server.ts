@@ -27,6 +27,7 @@ interface NormalizedArticle {
   title: string;
   link: string;
   description: string;
+  imageUrl?: string;
   pubDate: string;
   timestamp: number;
   sourceId: string;
@@ -159,6 +160,103 @@ function extractRawItems(parsedObj: Record<string, any>): any[] {
   return [];
 }
 
+function isLikelyTrackingImage(url: string): boolean {
+  const lower = url.toLowerCase();
+  return (
+    lower.includes('feedburner.com') ||
+    lower.includes('doubleclick.net') ||
+    lower.includes('1x1') ||
+    lower.includes('/pixel') ||
+    lower.includes('stat.') ||
+    lower.endsWith('.svg')
+  );
+}
+
+function validateImageCandidate(raw: unknown): string | undefined {
+  if (!raw || typeof raw !== 'string') return undefined;
+  const trimmed = decodeEntities(raw).trim();
+  if (!trimmed || isLikelyTrackingImage(trimmed)) return undefined;
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+      return parsed.toString();
+    }
+  } catch {
+    // Ignore invalid URL
+  }
+  return undefined;
+}
+
+function pickUrlFromMediaNode(node: unknown): string | undefined {
+  if (!node) return undefined;
+  if (Array.isArray(node)) {
+    for (const entry of node) {
+      const found = pickUrlFromMediaNode(entry);
+      if (found) return found;
+    }
+    return undefined;
+  }
+  if (typeof node === 'object') {
+    const obj = node as Record<string, unknown>;
+    const type = String(obj['@_type'] ?? '').toLowerCase();
+    const medium = String(obj['@_medium'] ?? '').toLowerCase();
+    const url = String(obj['@_url'] ?? obj['@_href'] ?? obj['url'] ?? obj['#text'] ?? '');
+    if (
+      !type ||
+      type.startsWith('image/') ||
+      medium === 'image' ||
+      /\.(jpe?g|png|webp|avif|gif)(\?|$)/i.test(url)
+    ) {
+      return validateImageCandidate(url);
+    }
+  }
+  if (typeof node === 'string') {
+    return validateImageCandidate(node);
+  }
+  return undefined;
+}
+
+function extractImageFromHtml(rawHtml: unknown): string | undefined {
+  if (!rawHtml) return undefined;
+  const html =
+    typeof rawHtml === 'string'
+      ? rawHtml
+      : typeof rawHtml === 'object' && rawHtml !== null && '#text' in rawHtml
+      ? String((rawHtml as Record<string, unknown>)['#text'] ?? '')
+      : '';
+  if (!html) return undefined;
+
+  const imgRegex = /<img[^>]+?(?:src|data-src)=["']([^"']+)["'][^>]*>/gi;
+  let match: RegExpExecArray | null;
+  while ((match = imgRegex.exec(html)) !== null) {
+    const tag = match[0];
+    if (/\b(?:width|height)=["']?1["']?\b/i.test(tag)) continue;
+    const valid = validateImageCandidate(match[1]);
+    if (valid) return valid;
+  }
+  return undefined;
+}
+
+function extractImageUrl(item: Record<string, any>): string | undefined {
+  const mediaGroup = item?.['media:group'];
+  const candidates = [
+    pickUrlFromMediaNode(item?.['media:content']),
+    pickUrlFromMediaNode(mediaGroup?.['media:content']),
+    pickUrlFromMediaNode(item?.['media:thumbnail']),
+    pickUrlFromMediaNode(mediaGroup?.['media:thumbnail']),
+    pickUrlFromMediaNode(item?.enclosure),
+    pickUrlFromMediaNode(item?.['itunes:image']),
+    pickUrlFromMediaNode(item?.['image:image']?.['image:loc']),
+    pickUrlFromMediaNode(item?.image),
+    extractImageFromHtml(item?.['content:encoded']),
+    extractImageFromHtml(item?.content),
+    extractImageFromHtml(item?.description),
+    extractImageFromHtml(item?.summary),
+  ];
+
+  return candidates.find((url): url is string => Boolean(url));
+}
+
 function parseTimestamp(rawDate: unknown): { iso: string; ms: number } {
   const str = cleanPlainText(rawDate);
   if (str) {
@@ -218,11 +316,14 @@ function parseXmlToArticles(
         newsNode?.['news:publication_date'];
       const { iso, ms } = parseTimestamp(rawDate);
 
+      const imageUrl = extractImageUrl(item);
+
       return {
         id: `${meta.sourceId}-${index}-${Buffer.from(link).toString('base64').slice(0, 12)}`,
         title,
         link,
         description,
+        ...(imageUrl ? { imageUrl } : {}),
         pubDate: iso,
         timestamp: ms,
         sourceId: meta.sourceId,

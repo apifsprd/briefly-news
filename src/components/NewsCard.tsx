@@ -4,17 +4,20 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import { ArticleItem } from '../types/rss';
 import { formatRelativeTime } from '../utils/date';
+import { ArticleImage } from './ArticleImage';
 
 interface NewsCardProps {
   article: ArticleItem;
   index: number;
   onSelect: (article: ArticleItem) => void;
+  className?: string;
 }
 
 export const NewsCard: React.FC<NewsCardProps> = ({
   article,
   index,
   onSelect,
+  className = '',
 }) => {
   return (
     <motion.article
@@ -26,7 +29,7 @@ export const NewsCard: React.FC<NewsCardProps> = ({
         ease: [0.16, 1, 0.3, 1],
       }}
       whileTap={{ scale: 0.99 }}
-      className="group flex flex-col justify-between bg-zinc-50/70 dark:bg-zinc-900/70 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 rounded-xl p-5 transition-colors cursor-pointer"
+      className={`group flex flex-col justify-between bg-zinc-50/70 dark:bg-zinc-900/70 border border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 rounded-xl p-5 transition-colors cursor-pointer ${className}`}
       onClick={() => onSelect(article)}
       role="button"
       tabIndex={0}
@@ -39,6 +42,12 @@ export const NewsCard: React.FC<NewsCardProps> = ({
       aria-label={`Read brief: ${article.title}`}
     >
       <div>
+        <ArticleImage
+          src={article.imageUrl}
+          alt={article.title}
+          className="aspect-[16/9] w-full rounded-lg mb-4"
+        />
+
         {/* Unboxed typographic metadata */}
         <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400 mb-2.5 flex-wrap">
           <span className="font-semibold text-zinc-800 dark:text-zinc-200">

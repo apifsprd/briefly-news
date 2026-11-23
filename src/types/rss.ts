@@ -26,6 +26,7 @@ export interface ArticleItem {
   title: string;
   link: string;
   description: string;
+  imageUrl?: string;
   pubDate: string;
   timestamp: number;
   sourceId: string;
