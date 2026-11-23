@@ -1,0 +1,6 @@
+{
+  "name": "Briefly",
+  "description": "Minimalist mobile-first monochrome RSS news aggregator with real-time feeds, instant headline search, and distraction-free reader mode.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

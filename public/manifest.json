@@ -1,0 +1,9 @@
+{
+  "name": "Briefly — Minimalist News Aggregator",
+  "short_name": "Briefly",
+  "description": "Minimalist mobile-first monochrome RSS news aggregator.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#111111"
+}
