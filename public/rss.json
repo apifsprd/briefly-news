@@ -87,6 +87,20 @@
       ]
     },
     {
+      "id": "science",
+      "name": "Science",
+      "feeds": [
+        {
+          "name":"ScienceDaily",
+          "url":"https://www.sciencedaily.com/rss/top/science.xml"
+        },
+         {
+          "name":"NASA",
+          "url":"https://www.nasa.gov/news-release/feed/"
+        }
+      ]
+    },
+    {
       "id": "tech",
       "name": "Tech",
       "feeds": [
@@ -113,6 +127,10 @@
         {
           "name": "Wired",
           "url": "https://www.wired.com/feed/rss"
+        },
+        {
+          "name": "BBC News",
+          "url": "https://feeds.bbci.co.uk/news/technology/rss.xml"
         }
       ]
     },
