@@ -73,6 +73,10 @@
       "name": "Market",
       "feeds": [
         {
+          "name": "BBC News",
+          "url": "https://feeds.bbci.co.uk/news/business/rss.xml"
+        },
+        {
           "name": "CNBC",
           "url": "https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=100003114"
         },
@@ -91,12 +95,12 @@
       "name": "Science",
       "feeds": [
         {
-          "name":"ScienceDaily",
-          "url":"https://www.sciencedaily.com/rss/top/science.xml"
+          "name": "ScienceDaily",
+          "url": "https://www.sciencedaily.com/rss/top/science.xml"
         },
-         {
-          "name":"NASA",
-          "url":"https://www.nasa.gov/news-release/feed/"
+        {
+          "name": "NASA",
+          "url": "https://www.nasa.gov/news-release/feed/"
         }
       ]
     },
@@ -147,7 +151,7 @@
           "url": "https://www.aljazeera.com/xml/rss/all.xml"
         },
         {
-          "name": "BBC",
+          "name": "BBC News",
           "url": "https://feeds.bbci.co.uk/news/world/rss.xml"
         },
         {
@@ -181,6 +185,10 @@
         {
           "name": "Mirror",
           "url": "https://www.mirror.co.uk/news/world-news/?service=rss"
+        },
+        {
+          "name": "NPR",
+          "url": "https://feeds.npr.org/1001/rss.xml"
         },
         {
           "name": "RT",
