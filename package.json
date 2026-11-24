@@ -7,7 +7,7 @@
     "dev": "tsx server.ts",
     "start": "NODE_ENV=production node server.ts",
     "build": "vite build",
-    "deploy": "npx wrangler pages deploy dist",
+    "deploy": "npx wrangler pages deploy dist --project-name briefly-news",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit"
