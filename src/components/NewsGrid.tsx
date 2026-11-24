@@ -448,7 +448,7 @@ export const NewsGrid: React.FC = () => {
                     <ArticleImage
                       src={latestTenArticles[0].imageUrl}
                       alt={latestTenArticles[0].title}
-                      className="w-full md:w-[38%] lg:w-[40%] aspect-[16/10] md:aspect-auto md:min-h-[220px] rounded-lg shrink-0"
+                      className="w-full md:w-[38%] lg:w-[40%] aspect-[16/10] md:aspect-auto md:h-full md:min-h-[220px] rounded-lg shrink-0"
                     />
                   </div>
                 </motion.article>
@@ -545,7 +545,7 @@ export const NewsGrid: React.FC = () => {
                                     src={article.imageUrl}
                                     alt={article.title}
                                     compact
-                                    className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg shrink-0 mt-0.5"
+                                    className="w-16 h-16 sm:w-24 sm:h-24 rounded-lg shrink-0 mt-0.5"
                                   />
 
                                   <div className="min-w-0 flex-1">

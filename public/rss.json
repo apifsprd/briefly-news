@@ -9,10 +9,6 @@
           "url": "https://bair.berkeley.edu/blog/feed.xml"
         },
         {
-          "name": "Hugging Face",
-          "url": "https://huggingface.co/blog/feed.xml"
-        },
-        {
           "name": "Microsoft",
           "url": "https://www.microsoft.com/en-us/research/feed/"
         },
@@ -23,28 +19,6 @@
         {
           "name": "OpenAI",
           "url": "https://openai.com/news/rss.xml"
-        }
-      ]
-    },
-    {
-      "id": "business",
-      "name": "Business",
-      "feeds": [
-        {
-          "name": "Daily Mail",
-          "url": "https://www.dailymail.com/money/index.rss"
-        },
-        {
-          "name": "Fortune",
-          "url": "https://fortune.com/feed/fortune-feeds/?id=3230629"
-        },
-        {
-          "name": "Harvard Business Review",
-          "url": "http://feeds.harvardbusiness.org/harvardbusiness/"
-        },
-        {
-          "name": "McKinsey",
-          "url": "https://www.mckinsey.com/insights/rss"
         }
       ]
     },
@@ -109,10 +83,6 @@
         {
           "name": "InvestingLive",
           "url": "https://investinglive.com/feed/news/"
-        },
-        {
-          "name": "Wall Street Journal",
-          "url": "https://feeds.content.dowjones.io/public/rss/RSSMarketsMain"
         }
       ]
     },
@@ -195,10 +165,6 @@
           "url": "https://www.mirror.co.uk/news/world-news/?service=rss"
         },
         {
-          "name": "NY Times",
-          "url": "https://www.nytimes.com/svc/collections/v1/publish/https://www.nytimes.com/section/world/rss.xml"
-        },
-        {
           "name": "RT",
           "url": "https://www.rt.com/rss/news/"
         },
@@ -217,14 +183,6 @@
         {
           "name": "Times of India",
           "url": "https://timesofindia.indiatimes.com/rssfeeds/296589292.cms"
-        },
-        {
-          "name": "Wall Street Journal",
-          "url": "https://feeds.content.dowjones.io/public/rss/RSSWorldNews"
-        },
-        {
-          "name": "Washington Post",
-          "url": "https://feeds.washingtonpost.com/rss/world"
         }
       ]
     }
